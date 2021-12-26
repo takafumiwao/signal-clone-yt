@@ -1,11 +1,23 @@
 import { StatusBar } from "expo-status-bar";
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { StyleSheet, KeyboardAvoidingView, View } from "react-native";
 import { Button, Input, Image } from "react-native-elements";
+import { auth } from "../firebase";
 
-const LoginScreen = () =>  {
+const LoginScreen = ({ navigation }) =>  {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    useEffect(() => {
+        const unsbscribe = auth.onAuthStateChanged((authUser) => {
+            if (authUser) {
+                navigation.replace("Home");
+            }
+        });
+
+        return unsbscribe;
+    }, []);
+
     const signIn = () => {};
     return (
         <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -16,14 +28,14 @@ const LoginScreen = () =>  {
             }}
             style={{ width: 200, height: 200}}/>
             <View style={styles.inputContainer}>
-                <Input placeholder="Email" autofocus type="email" value={email}
+                <Input placeholder="Email" autoFocus type="email" value={email}
                 onChangeText={(text) => setEmail(text)}/>
                 <Input placeholder="Password" secureTextEntry type="password" value={password}
                 onChangeText={(text) => setPassword(text)}/>
             </View>
 
             <Button containerStyle={styles.button} onPress={signIn} title="Login" />
-            <Button containerStyle={styles.button} type="outline" title="Register" />
+            <Button containerStyle={styles.button} onPress={() => navigation.navigate("Register")} type="outline" title="Register" />
             <View style={{ height: 100}}/>
         </KeyboardAvoidingView>
     );
