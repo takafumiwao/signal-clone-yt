@@ -4,6 +4,7 @@ import { KeyboardAvoidingView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Button, Input, Text } from "react-native-elements";
 import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const RegisterScreen = ({ navigation }) => {
     const [name, setName] = useState("");
@@ -18,14 +19,22 @@ const RegisterScreen = ({ navigation }) => {
     }, [navigation])
 
     const register = () => {
-        auth.createUserWithEmailAndPassword(email, password)
-        .then(authUser => {
-            authUser.user.update({
-                displayName: name,
-                photoURL: imageUrl || "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-            })
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+
+            updateProfile(user, {
+                "displayName": name,
+                "photoURL": imageUrl,
+            }).then(() => {
+            }).catch((error) => {
+                console.log(error.message);
+            });
         })
-        .catch(error => alert(error.message));
+        .catch(error => {
+            console.log(error.message);
+            alert(error.message);
+        });
     };
 
     return (
