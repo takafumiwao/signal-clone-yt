@@ -1,9 +1,9 @@
-import React, {useLayoutEffect, useState} from "react";
+import React, {useLayoutEffect,useEffect, useState} from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Button, Input} from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db, auth } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { addDoc, doc, setDoc, collection } from "firebase/firestore";
 
 const AddChatScreen = ({ navigation}) => {
     const [input, setInput] = useState("");
@@ -16,12 +16,13 @@ const AddChatScreen = ({ navigation}) => {
     }, [navigation]);
 
     const createChat = async () => {
-        await setDoc(doc(db, "chats", auth.currentUser.uid), {
+        await addDoc(collection(db, "chats"), {
             chatName: input,
         }).then(()=> {
             navigation.goBack();
         }).catch((error) => alert(error));
     }
+
 
     return (
         <View style={styles.container}>
@@ -34,7 +35,7 @@ const AddChatScreen = ({ navigation}) => {
                     <Icon name="wechat" type="antdesign" size={24} color="black" />
                 }
             />
-            <Button onPress={createChat} title="Create new Chat"/>
+            <Button disabled={!input} onPress={createChat} title="Create new Chat"/>
         </View>
     );
 };
